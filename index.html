@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Essay Whiteboard</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Lexend:wght@400;600;700&display=swap">
+<style>
+body{margin:0}
+/* Layout: a classroom wall with one framed whiteboard, a marker tray, and a teacher caption strip below. Single deliberate light look. */
+:root{
+  color-scheme: light;
+  --wall:#E3E9EC;
+  --wall-ink:#2A3439;
+  --frame:#B4BEC4;
+  --frame-dark:#8C979E;
+  --board:#FDFEFE;
+  --ink:#1E2328;
+  --red:#D2373C;
+  --green:#178A4C;
+  --blue:#2059C4;
+  --muted:#5F6C73;
+  --hand:"Patrick Hand","Comic Sans MS","Segoe Print",cursive;
+  --ui:"Lexend",system-ui,sans-serif;
+}
+body{background:var(--wall);color:var(--wall-ink);font-family:var(--ui);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 32px}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px}
+h1{font-family:var(--hand);font-weight:400;font-size:clamp(28px,4vw,40px);margin:0;letter-spacing:.5px;text-wrap:balance}
+header p{margin:0;color:var(--muted);font-size:14px}
+.frame{background:linear-gradient(180deg,#CDD5DA,var(--frame) 40%,var(--frame-dark));padding:clamp(6px,1.2vw,12px);border-radius:10px;box-shadow:0 10px 30px rgba(40,55,62,.22)}
+svg#board{display:block;width:100%;height:auto;background:var(--board);border-radius:4px;max-width:100%}
+.tray{height:12px;margin:0 6%;background:linear-gradient(180deg,var(--frame-dark),#77828A);border-radius:0 0 8px 8px;position:relative}
+.tray i{position:absolute;top:-5px;width:46px;height:9px;border-radius:5px}
+.caption{display:flex;gap:14px;align-items:flex-start;background:#fff;border-radius:12px;padding:14px 16px;min-height:76px;box-shadow:0 2px 0 rgba(0,0,0,.05)}
+.caption .who{flex:none;width:40px;height:40px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-family:var(--hand);font-size:22px}
+.caption p{margin:0;font-size:16px;line-height:1.55;max-width:70ch;transition:opacity .3s}
+.caption b{color:var(--blue)}
+.caption em{color:#7B3DB8;font-style:normal;font-weight:600}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,select{font-family:var(--ui);font-size:14px;border:2px solid var(--ink);background:#fff;color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer}
+button.primary{background:var(--ink);color:#fff;min-width:96px}
+button:focus-visible,select:focus-visible,.dot:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.dots{display:flex;gap:6px;flex-wrap:wrap}
+.dot{border:none;border-radius:999px;padding:6px 12px;background:#fff;color:var(--muted);font-size:13px;font-weight:600}
+.dot.on{background:var(--ink);color:#fff}
+.dot.done{color:var(--ink)}
+.course{color:var(--ink);font-weight:600}
+footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;border-top:1px solid var(--frame);padding-top:12px;margin-top:6px;font-size:13px;color:var(--muted)}
+footer span{font-family:var(--hand);font-size:19px;color:var(--ink)}
+label{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Problem–Solution Essay, live on the board</h1>
+    <p><span class="course">LSC 0316 · IELTS Task 2 Writing Practice</span> · Topic: students and their phones</p>
+  </header>
+
+  <div>
+    <div class="frame">
+      <svg id="board" viewBox="0 0 1000 625" role="img" aria-label="Animated whiteboard writing a problem-solution essay">
+        <defs>
+          <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="3" dy="5" stdDeviation="3" flood-opacity=".25"/></filter>
+        </defs>
+        <g id="content"></g>
+        <rect id="cover" x="0" y="0" width="0" height="625" fill="#FDFEFE"/>
+        <g id="eraser" transform="translate(-200,0)">
+          <rect x="-60" y="-40" width="120" height="80" rx="10" fill="#3B4A54"/>
+          <rect x="-60" y="22" width="120" height="18" rx="4" fill="#D9D2C3"/>
+          <text x="0" y="5" text-anchor="middle" font-family="Lexend,sans-serif" font-size="14" fill="#fff" font-weight="700">ERASER</text>
+        </g>
+        <g id="pen" transform="translate(930,590)" filter="url(#shadow)">
+          <g transform="rotate(32)">
+            <polygon points="-4,-22 4,-22 0,-2" fill="#2B2B2B"/>
+            <rect x="-9" y="-46" width="18" height="26" rx="3" fill="#E9ECEE"/>
+            <rect id="penCap" x="-10" y="-150" width="20" height="104" rx="7" fill="#1E2328"/>
+            <rect x="-10" y="-60" width="20" height="10" fill="#fff" opacity=".35"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <div class="tray" aria-hidden="true">
+      <i style="left:8%;background:var(--ink)"></i><i style="left:20%;background:var(--red)"></i>
+      <i style="left:32%;background:var(--green)"></i><i style="left:44%;background:var(--blue)"></i>
+    </div>
+  </div>
+
+  <div class="caption" aria-live="polite">
+    <div class="who" aria-hidden="true">T</div>
+    <p id="cap">Press play and watch the essay appear.</p>
+  </div>
+
+  <div class="controls">
+    <div class="btns">
+      <button class="primary" id="play">Pause</button>
+      <button id="restart">Replay scene</button>
+      <label for="speed">Speed
+        <select id="speed">
+          <option value="0.6">Slow</option>
+          <option value="1" selected>Normal</option>
+          <option value="1.6">Fast</option>
+          <option value="3">Very fast</option>
+        </select>
+      </label>
+    </div>
+    <div class="dots" id="dots"></div>
+  </div>
+  <footer>LSC 0316 · IELTS Task 2 Writing Practice<span>Designed by: Nazila Motahari</span></footer>
+</div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+const C={ink:"#1E2328",red:"#D2373C",green:"#178A4C",blue:"#2059C4",muted:"#5F6C73",purple:"#7B3DB8",orange:"#C46A12"};
+const content=document.getElementById("content"), pen=document.getElementById("pen"),
+      penCap=document.getElementById("penCap"), cover=document.getElementById("cover"),
+      eraser=document.getElementById("eraser"), cap=document.getElementById("cap"),
+      playBtn=document.getElementById("play");
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let speed=1, paused=false, run=0, uid=0, scene=0;
+const penPos={x:930,y:590};
+const CANCEL=Symbol("cancel");
+
+function el(tag,attrs,parent=content){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);parent.appendChild(e);return e}
+function tween(ms,step){
+  const id=run;
+  return new Promise((res,rej)=>{
+    let t=0,last=null;
+    function f(now){
+      if(id!==run)return rej(CANCEL);
+      if(last===null)last=now;
+      const dt=now-last;last=now;
+      if(!paused)t+=dt*speed;
+      const p=Math.min(1,t/ms);step(p);
+      p<1?requestAnimationFrame(f):res();
+    }
+    requestAnimationFrame(f);
+  });
+}
+const wait=ms=>tween(ms,()=>{});
+const ease=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+function setPen(x,y){penPos.x=x;penPos.y=y;pen.setAttribute("transform",`translate(${x},${y})`)}
+async function movePen(x,y,ms=280){const sx=penPos.x,sy=penPos.y;await tween(ms,p=>{const e=ease(p);setPen(sx+(x-sx)*e,sy+(y-sy)*e)})}
+function say(html){cap.style.opacity=0;setTimeout(()=>{cap.innerHTML=html;cap.style.opacity=1},150)}
+
+/* write: segments = string or [[text,color],...] */
+async function write(segs,x,y,o={}){
+  const size=o.size||30, color=o.color||C.ink;
+  if(typeof segs==="string")segs=[[segs,color]];
+  const id="c"+(++uid);
+  const cp=el("clipPath",{id});const r=el("rect",{x:0,y:0,width:0,height:625},cp);
+  const t=el("text",{x,y,"font-family":"Patrick Hand, Comic Sans MS, cursive","font-size":size,"clip-path":`url(#${id})`});
+  for(const [s,c] of segs){const ts=el("tspan",{fill:c||color},t);ts.textContent=s}
+  let b=t.getBBox();
+  if(o.center||o.cx!=null){x=(o.cx??500)-b.width/2;t.setAttribute("x",x);b=t.getBBox()}
+  r.setAttribute("x",b.x-4);
+  penCap.setAttribute("fill",segs[0][1]||color);
+  await movePen(b.x,y-size*.25);
+  const chars=segs.reduce((n,s)=>n+s[0].length,0);
+  const ms=o.ms||Math.max(400,chars*(size>40?60:42));
+  await tween(ms,p=>{const w=(b.width+8)*p;r.setAttribute("width",w);
+    setPen(b.x+w,y-size*.3+(reduce?0:Math.sin(p*chars*1.3)*size*.18))});
+  return {x:b.x,y:b.y,w:b.width,h:b.height,el:t};
+}
+async function draw(d,color=C.ink,o={}){
+  const p=el("path",{d,fill:"none",stroke:color,"stroke-width":o.width||4,"stroke-linecap":"round","stroke-linejoin":"round"});
+  const L=p.getTotalLength();
+  p.style.strokeDasharray=L;p.style.strokeDashoffset=L;
+  penCap.setAttribute("fill",color);
+  const s=p.getPointAtLength(0);await movePen(s.x,s.y,220);
+  await tween(o.ms||Math.max(300,L*2.2),q=>{p.style.strokeDashoffset=L*(1-q);const pt=p.getPointAtLength(L*q);setPen(pt.x,pt.y)});
+  return p;
+}
+async function stamp(label,x,y,color){
+  const g=el("g",{transform:`translate(${x},${y})`,opacity:0});
+  const t=el("text",{x:0,y:5,"text-anchor":"middle","font-family":"Lexend, sans-serif","font-weight":700,"font-size":13,fill:color,"letter-spacing":"1"},g);
+  t.textContent=label;
+  const w=t.getBBox().width+16;
+  const r=el("rect",{x:-w/2,y:-12,width:w,height:24,rx:6,fill:"none",stroke:color,"stroke-width":2},g);
+  g.insertBefore(r,t);
+  await tween(260,p=>{const s=p<.7?p/.7*1.25:1.25-(p-.7)/.3*.25;g.setAttribute("transform",`translate(${x},${y}) rotate(-6) scale(${s})`);g.style.opacity=Math.min(1,p*2)});
+}
+function wavy(x1,x2,y,amp=4){let d=`M${x1} ${y}`;for(let x=x1;x<x2;x+=18)d+=` q9 ${amp} 18 0`;return d}
+async function erase(){
+  if(!content.childNodes.length)return;
+  await movePen(930,590,200);
+  await tween(reduce?200:850,p=>{const x=-80+p*1180;eraser.setAttribute("transform",`translate(${x},${300+Math.sin(p*18)*130})`);cover.setAttribute("width",Math.max(0,x+60))});
+  content.innerHTML="";cover.setAttribute("width",0);eraser.setAttribute("transform","translate(-200,0)");
+}
+function heading(txt,color){return (async()=>{const h=await write(txt,160,82,{size:42,color});await draw(wavy(h.x,h.x+h.w,h.y+h.h+4,3),color,{width:3});})()}
+
+
+/* chain board: items = {say, lines:[segs], stamp:[label,color], tags:[[lines,color]]} */
+async function tag(lines,color,y){
+  const h=lines.length*24;
+  await draw(`M812 ${y-20} v${h}`,color,{width:3,ms:200});
+  for(let i=0;i<lines.length;i++)await write(lines[i],822,y+i*24-2,{size:21,color,ms:Math.max(250,lines[i].length*28)});
+}
+async function chainBoard(items,start=140){
+  let y=start;
+  for(const it of items){
+    if(it.say)say(it.say);
+    const y0=y;
+    for(const ln of it.lines){await write(ln,160,y,{size:28});y+=42}
+    if(it.stamp)await stamp(it.stamp[0],80,y0+(y-42-y0)/2-7,it.stamp[1]);
+    let ty=y0;
+    for(const [tl,tc] of (it.tags||[])){await tag(tl,tc,ty);ty+=tl.length*24+12}
+    y+=16;
+  }
+  return y;
+}
+const T=C.blue,G=C.purple,K=C.ink;
+
+/* ---------- Scenes ---------- */
+const scenes=[
+{name:"Title",async play(){
+  say("Today we'll write a <b>problem–solution essay</b> together. Our topic: students who spend too much time on their phones.");
+  const h=await write("Problem → Solution Essay",0,230,{size:64,center:true});
+  await draw(wavy(h.x,h.x+h.w,h.y+h.h+6,5),C.red,{width:4});
+  await write("Topic: Students and their phones",0,320,{size:38,color:C.blue,center:true});
+  await draw("M470 380 h60 a10 10 0 0 1 10 10 v110 a10 10 0 0 1 -10 10 h-60 a10 10 0 0 1 -10 -10 v-110 a10 10 0 0 1 10 -10 Z",C.ink);
+  await draw("M490 395 h20",C.ink,{width:3});
+  await draw("M500 492 m-6 0 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0",C.ink,{width:3});
+  await draw("M548 372 m-13 0 a13 13 0 1 0 26 0 a13 13 0 1 0 -26 0",C.red,{width:3});
+  await write("!",544,381,{size:24,color:C.red,ms:200});
+  say("The essay has <b>four paragraphs</b>: introduction, problems, solutions and conclusion.");
+  await write("4 paragraphs · 1 clear plan",0,575,{size:28,color:C.muted,center:true});
+}},
+{name:"Introduction",async play(){
+  say("<b>Paragraph 1: Introduction.</b> Start with background, a general fact everyone knows.");
+  await heading("1 · Introduction",C.blue);
+  await write("These days, almost every student in the UAE has a",160,150);
+  await write("smartphone, and many use it for hours every day.",160,195);
+  await stamp("BACKGROUND",80,172,C.blue);
+  say("Next, name the <b>problem</b> in one short sentence.");
+  await write([["This habit causes real problems for health and study.",C.ink]],160,262);
+  await stamp("PROBLEM",80,255,C.red);
+  say("Finish with the <b>thesis</b>. It tells the reader your plan for the whole essay.");
+  const a=await write("This essay will explain these problems and suggest",160,328);
+  const b=await write("two practical solutions.",160,373);
+  await draw(wavy(a.x,a.x+a.w,a.y+a.h+2,3),C.red,{width:3,ms:500});
+  await draw(wavy(b.x,b.x+b.w,b.y+b.h+2,3),C.red,{width:3,ms:300});
+  await stamp("THESIS",80,350,C.red);
+  await write("Tip: the thesis = your plan.",420,500,{size:30,color:C.green});
+  await draw("M415 490 C 360 470, 330 440, 320 405 M320 405 l-10 14 M320 405 l14 8",C.green,{width:3});
+}},
+{name:"Problem 1",async play(){
+  say("<b>Paragraph 2: The problems.</b> Every problem follows the same chain: <b>Problem → Explain → Example → Result</b>.");
+  await heading("2 · Body 1: Problem 1",C.red);
+  await draw("M905 38 a34 34 0 1 0 26 54 a27 27 0 1 1 -26 -54 Z",K,{width:3});
+  await write("z Z",935,50,{size:24,color:T,ms:300});
+  await chainBoard([
+    {say:"Open with a <b>topic sentence</b>. <b>There are several reasons why…</b> tells the reader what the paragraph is about.",
+     lines:[[["There are several reasons why",T],[" phone overuse is a",K]],"serious problem for students."],stamp:["TOPIC",K],tags:[[["There are several","reasons why…"],T]]},
+    {say:"Name the first problem with <b>One major problem is…</b>",
+     lines:[[["One major problem is",T],[" late-night scrolling.",K]]],stamp:["PROBLEM",C.red],tags:[[["One major","problem is…"],T]]},
+    {say:"<b>Explain</b> it. The structure <em>leads to</em> links a cause to its effect.",
+     lines:[[["Screen time at night ",K],["leads to",G],[" poor sleep because",K]],"the bright light keeps the brain awake."],stamp:["EXPLAIN",K],tags:[[["cause → effect","leads to + noun"],G]]},
+    {say:"Give a real <b>example</b> with <b>For example,</b>",
+     lines:[[["For example,",T],[" a student who watches videos",K]],"until 2 a.m. may fall asleep in class."],stamp:["EXAMPLE",C.muted],tags:[[["For example,"],T]]},
+    {say:"Finish the chain with the <b>result</b>: <b>As a result,</b>",
+     lines:[[["As a result,",T],[" they miss important information.",K]]],stamp:["RESULT",C.orange],tags:[[["As a result,"],T]]}
+  ]);
+}},
+{name:"Problem 2",async play(){
+  say("The paragraph continues with Problem 2. Same chain, new transitions. <b>Blue</b> = transitions, <em>purple</em> = sentence structures.");
+  await heading("2 · Body 1: Problem 2",C.red);
+  await draw("M850 35 v72 h110",K,{width:3});
+  await draw("M858 48 l26 16 l22 -4 l32 40 M938 100 l-2 -14 M938 100 l-14 -2",C.red,{width:4});
+  await chainBoard([
+    {say:"<b>In addition,</b> adds a second problem.",
+     lines:[[["In addition,",T],[" phones are a big distraction.",K]]],stamp:["PROBLEM",C.red],tags:[[["In addition,"],T]]},
+    {say:"Explain it with another cause-and-effect structure: <em>results in</em>. Remember: result <em>in</em>, lead <em>to</em>.",
+     lines:[[["Constant notifications ",K],["result in",G],[" poor focus",K]],"because students keep checking messages."],stamp:["EXPLAIN",K],tags:[[["cause → effect","results in + noun"],G]]},
+    {say:"<b>For instance,</b> is another way to introduce an example.",
+     lines:[[["For instance,",T],[" a student who checks every",K]],"message can take an hour to finish a","20-minute task."],stamp:["EXAMPLE",C.muted],tags:[[["For instance,"],T]]},
+    {say:"<b>Consequently,</b> means the same as <b>As a result,</b> Using both shows variety.",
+     lines:[[["Consequently,",T],[" their grades can drop.",K]]],stamp:["RESULT",C.orange],tags:[[["Consequently,"],T]]}
+  ]);
+}},
+{name:"Solution 1",async play(){
+  say("<b>Paragraph 3: The solutions.</b> Same chain: <b>Solution → Explain → Example → Result</b>. Solution 1 fixes Problem 1 (sleep).");
+  await heading("3 · Body 2: Solution 1",C.green);
+  await draw("M910 102 c-25 0 -33 -20 -33 -33 a33 33 0 1 1 66 0 c0 13 -8 33 -33 33 Z M897 112 h26",C.green,{width:3});
+  await chainBoard([
+    {say:"Introduce it with the structure <em>One solution is to + verb</em>.",
+     lines:[[["One solution is to",G],[" create a \"phone curfew\".",K]]],stamp:["SOLUTION",C.green],tags:[[["One solution","is to + verb"],G]]},
+    {say:"Explain who should do what with a modal verb: <em>should + verb</em>. The verb never changes after should.",
+     lines:[[["Parents ",K],["should keep",G],[" phones outside the",K]],"bedroom one hour before bedtime."],stamp:["EXPLAIN",K],tags:[[["modal verb","should + verb"],G]]},
+    {say:"Show how it works in real life: <b>For example,</b>",
+     lines:[[["For example,",T],[" students can charge their phones",K]],"in the kitchen and use an alarm clock."],stamp:["EXAMPLE",C.muted],tags:[[["For example,"],T]]},
+    {say:"Prove the solution works with the <em>first conditional</em>: If + present, will + verb. No <em>will</em> after if!",
+     lines:[[["If",G],[" students sleep better, they ",K],["will",G]],"concentrate more in morning classes."],stamp:["RESULT",C.orange],tags:[[["1st conditional","If…, …will…"],G]]}
+  ]);
+}},
+{name:"Solution 2",async play(){
+  say("Solution 2 fixes Problem 2 (focus). Watch for two new structures.");
+  await heading("3 · Body 2: Solution 2",C.green);
+  await draw("M885 105 c0 -35 8 -60 25 -60 c17 0 25 25 25 60 Z M877 105 h66",K,{width:3});
+  await draw("M866 42 L955 116",C.red,{width:4,ms:300});
+  await chainBoard([
+    {say:"<em>Another solution is to + verb</em> introduces the next answer.",
+     lines:[[["Another solution is to",G],[" use focus mode.",K]]],stamp:["SOLUTION",C.green],tags:[[["Another solution","is to + verb"],G]]},
+    {say:"<em>In order to</em> gives the purpose. <em>should be turned off</em> is the passive: a formal way to recommend.",
+     lines:[[["In order to",G],[" protect study time, notifications",K]],[["should be turned off",G],[" during homework.",K]]],stamp:["EXPLAIN",K],tags:[[["In order to…"],G],[["should be + V3"],G]]},
+    {say:"Another example with <b>For instance,</b>",
+     lines:[[["For instance,",T],[" \"Do Not Disturb\" can be set",K]],"for 45 minutes at a time."],stamp:["EXAMPLE",C.muted],tags:[[["For instance,"],T]]},
+    {say:"End with <b>This means that…</b> to show the good result.",
+     lines:[[["This means that",T],[" students will finish homework",K]],"faster and get better grades."],stamp:["RESULT",C.orange],tags:[[["This means","that…"],T]]}
+  ]);
+}},
+{name:"Conclusion",async play(){
+  say("<b>Paragraph 4: Conclusion.</b> Start with <b>In conclusion,</b> and restate the problems in new words.");
+  await heading("4 · Conclusion",C.ink);
+  const y=await chainBoard([
+    {lines:[[["In conclusion,",T],[" phone overuse ",K],["leads to",G],[" poor sleep",K]],"and weak focus in class."],stamp:["RESTATE",K],tags:[[["In conclusion,"],T]]},
+    {say:"<b>Summarise</b> the solutions. The <em>first conditional</em> works well here too. Don't add new ideas.",
+     lines:[[["However,",T],[" ",K],["if",G],[" students follow a phone curfew",K]],[["and use focus mode, they ",K],["will",G],[" do much better.",K]]],stamp:["SUMMARY",C.green],tags:[[["However,"],T],[["1st conditional"],G]]},
+    {say:"End with a <b>final thought</b> the reader will remember.",
+     lines:[[["Small changes today lead to better results",C.blue]],[["tomorrow!",C.blue]]],stamp:["FINAL IDEA",C.blue]}
+  ],150);
+  await draw("M840 470 l35 35 l75 -85",C.green,{width:8});
+}},
+{name:"Recap",async play(){
+  say("Here's the whole plan on one board. Use it for any problem–solution topic.");
+  await write("Your 4-paragraph plan",0,72,{size:44,center:true});
+  const boxes=[["Introduction",["background","+ thesis"],C.blue],["Body 1",["problems","+ examples"],C.red],["Body 2",["solutions","+ examples"],C.green],["Conclusion",["restate","+ final idea"],C.ink]];
+  for(let i=0;i<4;i++){
+    const x=40+i*240,[a,sub,c]=boxes[i],cx=x+100;
+    await draw(`M${x+14} 110 h172 a14 14 0 0 1 14 14 v122 a14 14 0 0 1 -14 14 h-172 a14 14 0 0 1 -14 -14 v-122 a14 14 0 0 1 14 -14 Z`,c,{width:4,ms:500});
+    await write(a,0,160,{size:30,color:c,cx});
+    await write(sub[0],0,203,{size:24,color:C.muted,cx});
+    await write(sub[1],0,234,{size:24,color:C.muted,cx});
+    if(i<3)await draw(`M${x+206} 185 h28 M${x+234} 185 l-10 -8 M${x+234} 185 l-10 8`,C.ink,{width:3,ms:250});
+  }
+  say("Inside each body paragraph, use the same <b>chain</b>.");
+  await write([["Body chain:  ",K],["Problem / Solution",C.red],[" → Explain → ",K],["Example",C.muted],[" → ",K],["Result",C.orange]],0,320,{size:28,cx:500});
+  say("And here is your toolkit: <b>transitions</b> in blue and <em>sentence structures</em> in purple.");
+  await write("Transitions:",40,385,{size:26});
+  await write([["One major problem is · In addition, · For example, · For instance,",T]],200,385,{size:24});
+  await write([["As a result, · Consequently, · This means that · In conclusion,",T]],200,422,{size:24});
+  await write("Structures:",40,482,{size:26});
+  await write([["leads to / results in · should + verb · One solution is to…",G]],200,482,{size:24});
+  await write([["If…, …will… · In order to… · should be + V3 (passive)",G]],200,519,{size:24});
+  await movePen(930,590,400);
+  say("Now it's your turn! Choose a new topic, like <b>traffic</b> or <b>fast food</b>, and use the same chain and toolkit.");
+}}
+];
+
+/* ---------- Player ---------- */
+const dots=document.getElementById("dots");
+scenes.forEach((s,i)=>{const b=document.createElement("button");b.className="dot";b.id="dot"+i;b.textContent=s.name;b.onclick=()=>go(i);dots.appendChild(b)});
+function markDots(){scenes.forEach((s,i)=>{const d=document.getElementById("dot"+i);d.classList.toggle("on",i===scene);d.classList.toggle("done",i<scene)})}
+async function go(i){
+  run++;const id=run;scene=i;markDots();
+  paused=false;playBtn.textContent="Pause";
+  try{
+    await erase();
+    for(let k=i;k<scenes.length;k++){
+      scene=k;markDots();
+      if(k>i){await wait(1600);await erase()}
+      await scenes[k].play();
+      await movePen(930,590,350);
+    }
+    playBtn.textContent="Play again";paused=true;finished=true;
+  }catch(e){if(e!==CANCEL)console.error(e)}
+}
+let finished=false;
+playBtn.onclick=()=>{
+  if(finished){finished=false;go(0);return}
+  paused=!paused;playBtn.textContent=paused?"Play":"Pause";
+};
+document.getElementById("restart").onclick=()=>{finished=false;go(scene)};
+document.getElementById("speed").onchange=e=>speed=+e.target.value;
+document.addEventListener("keydown",e=>{if(e.code==="Space"&&e.target.tagName!=="BUTTON"&&e.target.tagName!=="SELECT"){e.preventDefault();playBtn.click()}});
+if(reduce){speed=1.6;document.getElementById("speed").value="1.6"}
+document.fonts.load('30px "Patrick Hand"').catch(()=>{}).then(()=>document.fonts.ready).then(()=>go(0));
+</script>
+</body>
+</html>
