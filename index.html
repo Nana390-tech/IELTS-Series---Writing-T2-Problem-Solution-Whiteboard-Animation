@@ -51,6 +51,8 @@ button:focus-visible,select:focus-visible,.dot:focus-visible{outline:3px solid v
 .course{color:var(--ink);font-weight:600}
 footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;border-top:1px solid var(--frame);padding-top:12px;margin-top:6px;font-size:13px;color:var(--muted)}
 footer span{font-family:var(--hand);font-size:19px;color:var(--ink)}
+#music[aria-pressed="true"]{background:#7B3DB8;border-color:#7B3DB8;color:#fff}
+input[type=range]{accent-color:#7B3DB8;width:90px}
 label{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
 </style>
 </head>
@@ -100,6 +102,8 @@ label{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
     <div class="btns">
       <button class="primary" id="play">Pause</button>
       <button id="restart">Replay scene</button>
+      <button id="music" aria-pressed="false">Music: off</button>
+      <label for="vol">Volume <input type="range" id="vol" min="0" max="100" value="50"></label>
       <label for="speed">Speed
         <select id="speed">
           <option value="0.6">Slow</option>
@@ -358,7 +362,7 @@ scenes.forEach((s,i)=>{const b=document.createElement("button");b.className="dot
 function markDots(){scenes.forEach((s,i)=>{const d=document.getElementById("dot"+i);d.classList.toggle("on",i===scene);d.classList.toggle("done",i<scene)})}
 async function go(i){
   run++;const id=run;scene=i;markDots();
-  paused=false;playBtn.textContent="Pause";
+  paused=false;playBtn.textContent="Pause";syncMusic();
   try{
     await erase();
     for(let k=i;k<scenes.length;k++){
@@ -367,13 +371,61 @@ async function go(i){
       await scenes[k].play();
       await movePen(930,590,350);
     }
-    playBtn.textContent="Play again";paused=true;finished=true;
+    playBtn.textContent="Play again";paused=true;finished=true;syncMusic();
   }catch(e){if(e!==CANCEL)console.error(e)}
 }
+
+/* ---------- Light background music (generated live, no audio files) ---------- */
+let actx=null,master=null,musicOn=false,nextT=0,step=0,mTimer=null;
+const BEAT=0.34;
+const CHORDS=[[60,64,67,71],[57,60,64,67],[53,57,60,64],[55,59,62,67]]; // Cmaj7 Am7 Fmaj7 G
+const ARP=[0,1,2,3,2,1,2,3];
+const mtof=m=>440*Math.pow(2,(m-69)/12);
+function note(m,t,dur,gain,type){
+  const o=actx.createOscillator(),g=actx.createGain();
+  o.type=type;o.frequency.value=mtof(m);
+  g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(gain,t+0.015);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g);g.connect(master);o.start(t);o.stop(t+dur+0.05);
+}
+function schedule(){
+  while(nextT<actx.currentTime+0.25){
+    const bar=Math.floor(step/8)%CHORDS.length,i=step%8,ch=CHORDS[bar];
+    let m=ch[ARP[i]]+12;
+    if(step%32>=24&&i%2)m+=12; // a little sparkle every fourth bar
+    note(m,nextT,0.9,0.07,"triangle");
+    if(i===0){note(ch[0]-12,nextT,BEAT*7,0.09,"sine");ch.forEach(n=>note(n,nextT,BEAT*8,0.018,"sine"))}
+    if(i===4)note(ch[2]-12,nextT,BEAT*3,0.05,"sine");
+    nextT+=BEAT;step++;
+  }
+}
+function initAudio(){
+  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
+  actx=new AC();master=actx.createGain();
+  const delay=actx.createDelay(),fb=actx.createGain(),wet=actx.createGain(),lp=actx.createBiquadFilter();
+  delay.delayTime.value=BEAT*1.5;fb.gain.value=0.28;wet.gain.value=0.3;lp.type="lowpass";lp.frequency.value=2600;
+  master.connect(lp);lp.connect(actx.destination);
+  master.connect(delay);delay.connect(fb);fb.connect(delay);delay.connect(wet);wet.connect(lp);
+  setVol();nextT=actx.currentTime+0.1;mTimer=setInterval(schedule,80);
+  return true;
+}
+function setVol(){if(master)master.gain.value=(+document.getElementById("vol").value/100)*0.9}
+function syncMusic(){
+  if(!actx)return;
+  if(musicOn&&!paused){actx.resume().then(()=>{if(nextT<actx.currentTime)nextT=actx.currentTime+0.05})}
+  else actx.suspend();
+}
+const musicBtn=document.getElementById("music");
+musicBtn.onclick=()=>{
+  if(!actx&&!initAudio()){musicBtn.textContent="Music not supported";return}
+  musicOn=!musicOn;musicBtn.setAttribute("aria-pressed",musicOn);musicBtn.textContent=musicOn?"Music: on":"Music: off";
+  syncMusic();
+};
+document.getElementById("vol").oninput=setVol;
 let finished=false;
 playBtn.onclick=()=>{
   if(finished){finished=false;go(0);return}
-  paused=!paused;playBtn.textContent=paused?"Play":"Pause";
+  paused=!paused;playBtn.textContent=paused?"Play":"Pause";syncMusic();
 };
 document.getElementById("restart").onclick=()=>{finished=false;go(scene)};
 document.getElementById("speed").onchange=e=>speed=+e.target.value;
